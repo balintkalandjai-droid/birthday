@@ -305,34 +305,62 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Születésnapi Számláló</h1>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setEditMode(!editMode)}
-                  className={`p-2 rounded-full border text-lg hover:scale-110 transition-all flex-shrink-0 ${editMode ? 'border-indigo-500 bg-indigo-100 dark:bg-indigo-900/40' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'}`}>
+            {/* Cím — teljes szélesség */}
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              🎂 Születésnapi Számláló
+            </h1>
+
+            {/* Toolbar sor: bal oldal = módosítás gomb, jobb oldal = ikon csoport */}
+            <div className="flex items-center justify-between gap-3">
+              <Button onClick={handleChangeBirthday} variant="outline" className="text-sm">
+                Születésnap Módosítása
+              </Button>
+
+              {/* Ikon csoport — pill alakú kártya */}
+              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-2 py-1.5 shadow-sm">
+                {/* Szerkesztés */}
+                <button
+                  onClick={() => setEditMode(!editMode)}
+                  title="Widgetek szerkesztése"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all hover:scale-110 ${
+                    editMode
+                      ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}>
                   ✏️
                 </button>
+
+                {/* Elválasztó */}
+                <div className="w-px h-5 bg-gray-200 dark:bg-gray-600 mx-0.5" />
+
                 {/* Fogaskerék — beállítások */}
                 <button
                   ref={settingsBtnRef}
                   onClick={() => { setScrollY(window.scrollY); setShowSettings(true); }}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+                  title="Beállítások"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700">
                   ⚙️
                 </button>
-                <button onClick={toggleDark}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+
+                {/* Téma váltó */}
+                <button
+                  onClick={toggleDark}
+                  title={isDark ? 'Világos mód' : 'Sötét mód'}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700">
                   {isDark ? '☀️' : '🌙'}
                 </button>
-                <button onClick={() => { setScrollY(window.scrollY); setShowInfo(true); }}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+
+                {/* Elválasztó */}
+                <div className="w-px h-5 bg-gray-200 dark:bg-gray-600 mx-0.5" />
+
+                {/* Info */}
+                <button
+                  onClick={() => { setScrollY(window.scrollY); setShowInfo(true); }}
+                  title="Az appról"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700">
                   ℹ️
                 </button>
               </div>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleChangeBirthday} variant="outline" className="text-sm">
-                Születésnap Módosítása
-              </Button>
             </div>
           </div>
 
