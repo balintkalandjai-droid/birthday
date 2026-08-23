@@ -336,13 +336,6 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
                 </button>
               </div>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <button 
-                onClick={handleChangeBirthday} 
-                className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all active:scale-95">
-                🎂 Születésnap Módosítása
-              </button>
-            </div>
           </div>
 
           {/* Edit mode */}
