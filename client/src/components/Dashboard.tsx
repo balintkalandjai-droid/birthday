@@ -306,7 +306,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
           {/* Header */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight tracking-tight">
                 Születésnapi Számláló
               </h1>
               <div className="flex items-center gap-2 flex-wrap">
