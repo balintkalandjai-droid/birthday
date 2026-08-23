@@ -522,7 +522,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
               <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">Buday Bálint</p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 mb-3">
-              <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Youtube</p>
+              <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Youtube1</p>
               <a href="https://www.youtube.com/@BálintKalandjai" target="_blank" rel="noopener noreferrer"
                 className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Bálint Kalandjai</a>
             </div>
