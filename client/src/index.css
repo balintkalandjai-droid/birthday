@@ -31,6 +31,7 @@
     --radius: 0.5rem;
     --app-bg: #eef2ff;
   }
+
   .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
@@ -64,6 +65,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     background-color: var(--app-bg);
@@ -80,6 +82,7 @@
   cursor: grab;
   touch-action: none;
 }
+
 .drag-handle:active {
   cursor: grabbing;
 }
@@ -89,8 +92,41 @@
   opacity: 0.5;
   transform: scale(0.98);
 }
+
 .widget-dragover {
   outline: 2px dashed #6366f1;
   outline-offset: 2px;
   border-radius: 12px;
+}
+
+/*
+ * Mobil nézet:
+ * A Dashboard desktopon szándékosan használja az auto-rows-fr + 100% magasságot,
+ * ezért ott nem változtatunk semmin.
+ *
+ * Telefonon viszont egy oszlop van, így az auto-rows-fr és a h-full
+ * a kártyákat a sor legmagasabb elemének magasságára nyújtja.
+ * Itt minden kártya csak a saját tartalmáig legyen magas.
+ */
+@media (max-width: 767px) {
+  .widget-stretch {
+    grid-auto-rows: auto !important;
+    align-items: start !important;
+  }
+
+  .widget-stretch > * {
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: start !important;
+  }
+
+  .widget-stretch .flex.flex-col.h-full {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .widget-stretch .flex.flex-col.h-full > * {
+    height: auto !important;
+    min-height: 0 !important;
+  }
 }
