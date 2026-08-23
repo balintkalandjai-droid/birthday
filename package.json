@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.js",
-    "build": "vite build",
+    "build": "vite build && tsc -p tsconfig.server.json",
     "start": "npm run build && node dist/server/index.js"
   },
   "dependencies": {
