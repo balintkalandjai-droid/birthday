@@ -305,26 +305,33 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Születésnapi Számláló</h1>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setEditMode(!editMode)}
-                  className={`p-2 rounded-full border text-lg hover:scale-110 transition-all flex-shrink-0 ${editMode ? 'border-indigo-500 bg-indigo-100 dark:bg-indigo-900/40' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                Születésnapi Számláló
+              </h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button 
+                  onClick={() => setEditMode(!editMode)}
+                  className={`w-10 h-10 flex items-center justify-center rounded-full border text-base hover:scale-105 transition-all flex-shrink-0 ${
+                    editMode ? 'border-indigo-500 bg-indigo-100 dark:bg-indigo-900/40' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
                   ✏️
                 </button>
                 {/* Fogaskerék — beállítások */}
                 <button
                   ref={settingsBtnRef}
                   onClick={() => { setScrollY(window.scrollY); setShowSettings(true); }}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-base hover:scale-105 transition-transform flex-shrink-0">
                   ⚙️
                 </button>
-                <button onClick={toggleDark}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+                <button 
+                  onClick={toggleDark}
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-base hover:scale-105 transition-transform flex-shrink-0">
                   {isDark ? '☀️' : '🌙'}
                 </button>
-                <button onClick={() => { setScrollY(window.scrollY); setShowInfo(true); }}
-                  className="p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xl hover:scale-110 transition-transform flex-shrink-0">
+                <button 
+                  onClick={() => { setScrollY(window.scrollY); setShowInfo(true); }}
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-base hover:scale-105 transition-transform flex-shrink-0">
                   ℹ️
                 </button>
               </div>
