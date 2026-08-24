@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Card } from '../../components/ui/card';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
+// Az interface rendben van itt kívül
 interface WeatherData {
   temp: number;
   description: string;
@@ -11,10 +13,18 @@ interface WeatherData {
 }
 
 export default function Weather() {
+  // ✅ JAVÍTVA: a hook-ok és az early return a komponensen BELÜL kell legyenek
+  const isOnline = useOnlineStatus();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Ha offline, ne próbáljon lekérni semmit
+    if (!isOnline) {
+      setLoading(false);
+      return;
+    }
+
     const fetchWeather = async () => {
       try {
         setLoading(true);
@@ -39,7 +49,22 @@ export default function Weather() {
     fetchWeather();
     const interval = setInterval(fetchWeather, 600000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isOnline]); // isOnline változásra újra fut
+
+  // ✅ Offline állapot - a hooks-ok után, de a return előtt
+  if (!isOnline) {
+    return (
+      <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg">
+        <div className="text-center">
+          <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4 uppercase">
+            Időjárás - Budapest
+          </h2>
+          <div className="text-4xl mb-2">📵</div>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">Offline – időjárás nem elérhető</p>
+        </div>
+      </Card>
+    );
+  }
 
   if (loading || !weather) {
     return (

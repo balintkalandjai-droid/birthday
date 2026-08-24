@@ -1,7 +1,20 @@
+// ============================================================
+// Birthday Buddy - Service Worker
+// Timer + Stopwatch értesítések ÉS offline cache egyben
+// ============================================================
+
+const CACHE_NAME = 'birthday-buddy-v1';
+
+// -------------------------------------------------------
+// MEGLÉVŐ: Timer / Stopwatch állapot
+// -------------------------------------------------------
 let timerInterval = null;
 let timerEnd = null;
 let timerName = '';
 
+// -------------------------------------------------------
+// MEGLÉVŐ: Message handler (timer, stopwatch, countdown)
+// -------------------------------------------------------
 self.addEventListener('message', (event) => {
   const data = event.data;
   if (!data) return;
@@ -52,6 +65,9 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// -------------------------------------------------------
+// MEGLÉVŐ: Timer segédfüggvények
+// -------------------------------------------------------
 function fmtSecs(s) {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
@@ -99,6 +115,9 @@ function stopTimerNotification() {
   self.registration.getNotifications({ tag: 'timer-running' }).then(ns => ns.forEach(n => n.close()));
 }
 
+// -------------------------------------------------------
+// MEGLÉVŐ: Push értesítés handler
+// -------------------------------------------------------
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   if (data.type === 'timer-start') {
@@ -127,6 +146,9 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+// -------------------------------------------------------
+// MEGLÉVŐ: Értesítésre kattintás handler
+// -------------------------------------------------------
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   if (event.action === 'close') return;
@@ -140,5 +162,87 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', (event) => event.waitUntil(clients.claim()));
+// -------------------------------------------------------
+// ÚJ: Install - cache az alapoldalt
+// (a régi csak self.skipWaiting() volt, ez bővebb)
+// -------------------------------------------------------
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    fetch('/').then(response => {
+      return caches.open(CACHE_NAME).then(cache => cache.put('/', response));
+    }).catch(() => {})
+  );
+  self.skipWaiting();
+});
+
+// -------------------------------------------------------
+// ÚJ: Activate - régi cache törlése + clients.claim
+// -------------------------------------------------------
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    Promise.all([
+      // Régi cache-ek törlése
+      caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      ),
+      // Meglévő: azonnal átveszi az irányítást
+      clients.claim()
+    ])
+  );
+});
+
+// -------------------------------------------------------
+// ÚJ: Fetch - offline cache stratégia
+// -------------------------------------------------------
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Külső API (időjárás /api/weather is ide esik ha külső) -> Network First
+  // Ha offline: cache-ből, vagy JSON {offline: true}
+  if (url.hostname !== self.location.hostname) {
+    event.respondWith(
+      fetch(event.request.clone())
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then(cached => {
+            if (cached) return cached;
+            return new Response(
+              JSON.stringify({ offline: true, error: 'Nincs internetkapcsolat' }),
+              { status: 503, headers: { 'Content-Type': 'application/json' } }
+            );
+          })
+        )
+    );
+    return;
+  }
+
+  // Saját fájlok (HTML, CSS, JS, képek) -> Cache First + háttérfrissítés
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      const networkFetch = fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Navigációnál (oldal újratöltés) -> cached index
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+        });
+
+      return cached || networkFetch;
+    })
+  );
+});

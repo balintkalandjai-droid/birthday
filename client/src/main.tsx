@@ -3,6 +3,13 @@ import * as ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
+
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 function updateDarkClass(isDark: boolean) {
