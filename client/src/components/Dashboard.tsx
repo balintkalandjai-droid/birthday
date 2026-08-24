@@ -475,7 +475,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
                   <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-200">🥚 Easter egg-ek kikapcsolása</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Bálint/derék nem forgatja az oldalt</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Bálint/hordó nem forgatja az oldalt</p>
                     </div>
                     <Toggle value={disableEasterEggs} onChange={handleDisableEasterEggs} />
                   </div>
