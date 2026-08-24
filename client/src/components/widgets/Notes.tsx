@@ -45,7 +45,7 @@ function checkEasterEggs(notes: Note[]) {
   let target = 0;
   if (hasBalint && hasHordo) target = 270;
   else if (hasBalint) target = 180;
-  else if (hasHordo) target = 180;
+  else if (hasHordo) target = 360;
 
   currentRotation = target;
   document.body.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
