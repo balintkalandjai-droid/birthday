@@ -26,7 +26,7 @@ let currentRotation = 0;
 function checkEasterEggs(notes: Note[]) {
   const allText = notes.map(n => n.text.toLowerCase()).join(' ');
   const hasBalint = allText.includes('bálint') || allText.includes('balint');
-  const hasDerek = allText.includes('derék') || allText.includes('derek');
+  const hasHordo = allText.includes('hordó') || allText.includes('hordo');
   const hasAbel = allText.includes('ábel') || allText.includes('abel');
 
   if (hasAbel) {
@@ -43,9 +43,9 @@ function checkEasterEggs(notes: Note[]) {
   }
 
   let target = 0;
-  if (hasBalint && hasDerek) target = 270;
+  if (hasBalint && hasHordo) target = 270;
   else if (hasBalint) target = 180;
-  else if (hasDerek) target = 90;
+  else if (hasHordo) target = 180;
 
   currentRotation = target;
   document.body.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
