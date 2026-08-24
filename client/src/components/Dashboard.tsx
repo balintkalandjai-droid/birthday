@@ -69,6 +69,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
 
   // Beállítások state
   const [lockRotation, setLockRotation] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
   const [disableEasterEggs, setDisableEasterEggs] = useState(false);
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
@@ -102,6 +103,32 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
     document.body.style.overscrollBehaviorY = 'contain';
     return () => { document.body.style.overscrollBehaviorY = ''; };
   }, []);
+
+  // Orientáció lock — screen.orientation.lock() WebView-ban nem mindig működik,
+  // ezért landscape esetén egy overlay-t mutatunk (megbízható fallback)
+  useEffect(() => {
+    const checkOrientation = () => {
+      const landscape = window.innerWidth > window.innerHeight;
+      setIsLandscape(landscape && lockRotation);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    // Natív API próba (csak fullscreen módban működik, de nem árt megpróbálni)
+    if (lockRotation) {
+      (screen.orientation as any)?.lock?.('portrait').catch(() => {});
+    } else {
+      (screen.orientation as any)?.unlock?.();
+      setIsLandscape(false);
+    }
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, [lockRotation]);
 
   // Beállítások betöltése
   useEffect(() => {
@@ -177,8 +204,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
   const handleLockRotation = (val: boolean) => {
     setLockRotation(val);
     saveAppSettings(val, disableEasterEggs);
-    if (val) { try { (screen.orientation as any)?.lock?.('portrait'); } catch {} }
-    else { try { (screen.orientation as any)?.unlock?.(); } catch {} }
+    // A useEffect kezeli az orientáció lock/unlock logikát
   };
 
   const handleDisableEasterEggs = (val: boolean) => {
@@ -273,6 +299,24 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
 
   return (
     <>
+      {/* 🔒 Landscape overlay — ha elforgatás tiltva van és landscape módban van */}
+      {isLandscape && (
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.95)' }}>
+          <div className="text-7xl mb-5" style={{ animation: 'rotatehint 1.5s ease-in-out infinite alternate' }}>
+            📱
+          </div>
+          <p className="text-white text-xl font-bold mb-2">Forgasd vissza a telefont</p>
+          <p className="text-gray-400 text-sm">Az app portré módban működik</p>
+          <style>{`
+            @keyframes rotatehint {
+              from { transform: rotate(-15deg); }
+              to   { transform: rotate(15deg); }
+            }
+          `}</style>
+        </div>
+      )}
+
       {/* Pull-to-refresh indicator */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden"
         style={{ height: pullDistance > 0 || isRefreshing ? Math.max(pullDistance, isRefreshing ? 60 : 0) : 0 }}>
