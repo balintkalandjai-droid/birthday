@@ -442,95 +442,69 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
             <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto">
 
               {/* Push értesítések */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  🔔 Push értesítések
-                </p>
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">🔔 Push értesítések</p>
+                  <button onClick={handleEnablePush} disabled={pushLoading || permission === 'denied'}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${pushEnabled ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-indigo-600 text-white hover:bg-indigo-700'} disabled:opacity-50`}>
+                    {pushLoading ? '...' : pushEnabled ? '✅ Bekapcsolva' : 'Bekapcsolás'}
+                  </button>
+                </div>
+                {permission === 'denied' && <p className="text-xs text-red-500 mb-2">❌ Letiltva a böngészőben</p>}
 
-                <button
-                  onClick={handleEnablePush}
-                  disabled={pushLoading || permission === 'denied'}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    pushEnabled
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  } disabled:opacity-50`}
-                >
-                  {pushLoading ? '...' : pushEnabled ? '✅ Bekapcsolva' : 'Bekapcsolás'}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <span className="text-xs text-gray-700 dark:text-gray-300">🎂 Születésnapi értesítők</span>
+                    <Toggle value={bSettings.enabled} onChange={() => toggleB('enabled')} />
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <span className="text-xs text-gray-700 dark:text-gray-300">👤 Névnap értesítők</span>
+                    <Toggle value={nameDayAlerts} onChange={v => { setNameDayAlerts(v); saveNotifSettings({ nameDayAlerts: v }); }} />
+                  </div>
+                </div>
+
+                <button onClick={() => setSettingsExpanded(!settingsExpanded)}
+                  className="w-full text-xs text-indigo-500 hover:underline text-center mt-2">
+                  {settingsExpanded ? '▲ Kevesebb' : '▼ Részletes beállítások'}
                 </button>
+
+                {settingsExpanded && (
+                  <div className="mt-3 space-y-4">
+                    {bSettings.enabled && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-400 uppercase font-semibold">Születésnap emlékeztetők</p>
+                        {[
+                          { key: 'oneWeekBefore', label: '1 héttel előbb' },
+                          { key: 'threeDaysBefore', label: '3 nappal előbb' },
+                          { key: 'oneDayBefore', label: '1 nappal előbb' },
+                          { key: 'onBirthdayDay', label: 'A születésnapomon 🎉' },
+                        ].map(({ key, label }) => (
+                          <div key={key} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <span className="text-xs text-gray-700 dark:text-gray-300">{label}</span>
+                            <Toggle value={bSettings[key as keyof typeof bSettings] as boolean} onChange={() => toggleB(key)} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {nameDayAlerts && (
+                      <div>
+                        <p className="text-xs text-gray-400 uppercase font-semibold mb-2">Névnap emlékeztetők</p>
+                        <div className="flex flex-wrap gap-2">
+                          {[{ d: 0, label: 'Aznap' }, { d: 1, label: '1 nap' }, { d: 3, label: '3 nap' }, { d: 7, label: '1 hét' }].map(({ d, label }) => (
+                            <button key={d} onClick={() => toggleNameDayDay(d)}
+                              className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${nameDayDays.includes(d) ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <button
-                type="button"
-                onClick={async () => {
-                  alert('⏳ 10 másodperc múlva érkezik a teszt értesítés!');
+              <hr className="border-gray-100 dark:border-gray-700" />
 
-                  await new Promise(resolve => setTimeout(resolve, 10000));
-
-                  try {
-                    const response = await fetch('/api/push/test');
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                      alert(`❌ Teszt hiba: ${data.error || 'Ismeretlen hiba'}`);
-                      return;
-                    }
-
-                    console.log(`🧪 Push elküldve! Kiküldve: ${data.sent}`);
-                  } catch {
-                    alert('❌ Nem sikerült elküldeni a push értesítést.');
-                  }
-                }}
-                className="w-full mb-3 py-2.5 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 active:scale-[0.98] transition-all"
-              >
-                🧪 10 mp-es push teszt
-              </button>
-
-              {permission === 'denied' && (
-                <p className="text-xs text-red-500 mb-2">
-                  ❌ Letiltva a böngészőben
-                </p>
-              )}
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <span className="text-xs text-gray-700 dark:text-gray-300">
-                    🎂 Születésnapi értesítők
-                  </span>
-                  <Toggle
-                    value={bSettings.enabled}
-                    onChange={() => toggleB('enabled')}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <span className="text-xs text-gray-700 dark:text-gray-300">
-                    👤 Névnap értesítők
-                  </span>
-                  <Toggle
-                    value={nameDayAlerts}
-                    onChange={v => {
-                      setNameDayAlerts(v);
-                      saveNotifSettings({ nameDayAlerts: v });
-                    }}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={() => setSettingsExpanded(!settingsExpanded)}
-                className="w-full text-xs text-indigo-500 hover:underline text-center mt-2"
-              >
-                {settingsExpanded ? '▲ Kevesebb' : '▼ Részletes beállítások'}
-              </button>
-
-              {settingsExpanded && (
-                <div className="mt-3 space-y-4">
-                  {/* IDE MARAD A FÁJLODBAN LÉVŐ RÉSZLETES BEÁLLÍTÁS */}
-                </div>
-              )}
-            </div>
               {/* App beállítások */}
               <div>
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">📱 App beállítások</p>
