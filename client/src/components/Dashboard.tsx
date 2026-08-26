@@ -464,6 +464,10 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
               <button
                 type="button"
                 onClick={async () => {
+                  alert('⏳ 10 másodperc múlva érkezik a teszt értesítés!');
+
+                  await new Promise(resolve => setTimeout(resolve, 10000));
+
                   try {
                     const response = await fetch('/api/push/test');
                     const data = await response.json();
@@ -473,16 +477,14 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
                       return;
                     }
 
-                    alert(
-                      `🧪 Teszt elküldve!\nKiküldött értesítések: ${data.sent}`
-                    );
+                    console.log(`🧪 Push elküldve! Kiküldve: ${data.sent}`);
                   } catch {
-                    alert('❌ Nem sikerült kapcsolódni a szerverhez.');
+                    alert('❌ Nem sikerült elküldeni a push értesítést.');
                   }
                 }}
                 className="w-full mb-3 py-2.5 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 active:scale-[0.98] transition-all"
               >
-                🧪 Értesítés tesztelése
+                🧪 10 mp-es push teszt
               </button>
 
               {permission === 'denied' && (
