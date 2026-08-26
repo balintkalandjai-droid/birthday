@@ -442,14 +442,44 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
             <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto">
 
               {/* Push értesítések */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">🔔 Push értesítések</p>
-                  <button onClick={handleEnablePush} disabled={pushLoading || permission === 'denied'}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${pushEnabled ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-indigo-600 text-white hover:bg-indigo-700'} disabled:opacity-50`}>
-                    {pushLoading ? '...' : pushEnabled ? '✅ Bekapcsolva' : 'Bekapcsolás'}
-                  </button>
-                </div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  🔔 Push értesítések
+                </p>
+                <button
+                  onClick={handleEnablePush}
+                  disabled={pushLoading || permission === 'denied'}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    pushEnabled
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  } disabled:opacity-50`}
+                 >
+                  {pushLoading ? '...' : pushEnabled ? '✅ Bekapcsolva' : 'Bekapcsolás'}
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/push/test');
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                      alert(`❌ Teszt hiba: ${data.error || 'Ismeretlen hiba'}`);
+                      return;
+                    }
+
+                    alert(`🧪 Teszt elküldve!\nKiküldött értesítések: ${data.sent}`);
+                  } catch (error) {
+                    alert('❌ Nem sikerült kapcsolódni a szerverhez.');
+                  }
+                }}
+                className="w-full mb-3 py-2.5 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 active:scale-[0.98] transition-all"
+              >
+                🧪 Értesítés tesztelése
+              </button>
                 {permission === 'denied' && <p className="text-xs text-red-500 mb-2">❌ Letiltva a böngészőben</p>}
 
                 <div className="space-y-2">
