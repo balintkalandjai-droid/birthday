@@ -16,6 +16,7 @@ import NotificationsWidget from '../components/widgets/NotificationsWidget';
 import RemindersWidget from '../components/widgets/RemindersWidget';
 import { Button } from '../components/ui/button';
 import { subscribeToPush, unsubscribeFromPush } from '../lib/pushHelper';
+import FriendsBirthdays from '../components/widgets/FriendsBirthdays';
 
 interface DashboardProps {
   birthday: string;
@@ -24,14 +25,14 @@ interface DashboardProps {
 
 // 'settings' és 'notifications' eltávolítva a widgetekből — beállítások csak fogaskerékből
 const DEFAULT_ORDER = [
-  'clock', 'birthday', 'weather', 'nameday', 'age',
+  'clock', 'birthday', 'weather', 'nameday', 'friendsbirthdays', 'age',   // ← ide szúrd be: 'friendsbirthdays'
   'reminders', 'holidays', 'onthisday', 'quiz',
   'countdown', 'stopwatch', 'notes', 'joke',
 ];
 
 const WIDGET_LABELS: Record<string, string> = {
   clock: '🕐 Óra', birthday: '🎂 Születésnap számláló', weather: '🌤 Időjárás',
-  nameday: '👤 Névnap', age: '🎂 Életkor',
+  nameday: '👤 Névnap', friendsbirthdays: '🎂 Ismerősök Szülinapja', age: '🎂 Életkor',   // ← ide szúrd be a párost
   reminders: '⏰ Emlékeztetők',
   holidays: '🎉 Ünnepek', onthisday: '📰 Ezen a napon', quiz: '🎯 Napi kvíz',
   countdown: '⏰ Időzítő', stopwatch: '⏱️ Stopper', notes: '📝 jegyzetek',
@@ -275,6 +276,7 @@ export default function Dashboard({ birthday, onChangeBirthday }: DashboardProps
       case 'birthday': return wrap(<BirthdayCountdown birthday={birthday} />);
       case 'weather': return wrap(<Weather />);
       case 'nameday': return wrap(<NameDay birthday={birthday} />);
+      case 'friendsbirthdays': return wrap(<FriendsBirthdays />);
       case 'age': return wrap(<AgeCounter birthday={birthday} />);
       case 'reminders': return wrap(<RemindersWidget birthday={birthday} />);
       case 'holidays': return wrap(<Holidays />);
