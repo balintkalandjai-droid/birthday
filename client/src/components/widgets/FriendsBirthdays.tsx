@@ -5,7 +5,6 @@ interface FriendBirthday {
   id: string;
   name: string;
   date: string;   // 'YYYY-MM-DD'
-  time?: string;  // 'HH:MM' — opcionális
   note?: string;  // megjegyzés
 }
 
@@ -57,7 +56,7 @@ export default function FriendsBirthdays() {
   const [browseIndex, setBrowseIndex] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<Partial<FriendBirthday>>({
-    name: '', date: '', time: '', note: '',
+    name: '', date: '', note: '',
   });
   const [error, setError] = useState('');
 
@@ -73,11 +72,11 @@ export default function FriendsBirthdays() {
   }, [friends]);
 
   useEffect(() => {
-    if (browseIndex >= sorted.length) setBrowseIndex(0);
+    if (browseIndex >= sorted.length) setBrowseIndex(Math.max(0, sorted.length - 1));
   }, [sorted.length, browseIndex]);
 
   const upcoming = sorted[0];
-  const browsed = sorted[browseIndex];
+  const browsed = sorted[browseIndex] ?? sorted[0];
 
   const handleAdd = () => {
     if (!form.name?.trim()) { setError('Add meg a nevet'); return; }
@@ -87,12 +86,11 @@ export default function FriendsBirthdays() {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
       name: form.name.trim(),
       date: form.date,
-      time: form.time || undefined,
       note: form.note?.trim() || undefined,
     };
 
     setFriends(prev => [...prev, entry]);
-    setForm({ name: '', date: '', time: '', note: '' });
+    setForm({ name: '', date: '', note: '' });
     setError('');
     setShowForm(false);
   };
@@ -126,7 +124,6 @@ export default function FriendsBirthdays() {
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {formatDate(upcoming.next)}
-              {upcoming.friend.time ? ` · ${upcoming.friend.time}` : ''}
             </p>
             {upcoming.turningAge !== null && (
               <p className="text-xs text-gray-400 mt-0.5">{upcoming.turningAge}. születésnap</p>
@@ -145,9 +142,9 @@ export default function FriendsBirthdays() {
             </p>
           </div>
 
-          {/* Egyesével böngészés */}
-          {sorted.length > 1 && (
-            <div className="border border-gray-100 dark:border-gray-700 rounded-xl p-3 mb-3">
+          {/* Egyesével böngészés — 1 bejegyzésnél is látszik, csak a nyilak tűnnek el */}
+          <div className="border border-gray-100 dark:border-gray-700 rounded-xl p-3 mb-3">
+            {sorted.length > 1 && (
               <div className="flex items-center justify-between mb-2">
                 <button
                   onClick={() => setBrowseIndex(i => (i - 1 + sorted.length) % sorted.length)}
@@ -163,31 +160,30 @@ export default function FriendsBirthdays() {
                   ▶
                 </button>
               </div>
+            )}
 
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                    {browsed.friend.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDate(browsed.next)}
-                    {browsed.friend.time ? ` · ${browsed.friend.time}` : ''}
-                    {' · '}{browsed.daysLeft === 0 ? 'ma' : `${browsed.daysLeft} nap`}
-                  </p>
-                  {browsed.friend.note && (
-                    <p className="text-xs italic text-gray-400 truncate">"{browsed.friend.note}"</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleDelete(browsed.friend.id)}
-                  className="text-red-400 hover:text-red-600 text-lg flex-shrink-0"
-                  title="Törlés"
-                >
-                  ×
-                </button>
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
+                  {browsed.friend.name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatDate(browsed.next)}
+                  {' · '}{browsed.daysLeft === 0 ? 'ma' : `${browsed.daysLeft} nap`}
+                </p>
+                {browsed.friend.note && (
+                  <p className="text-xs italic text-gray-400 truncate">"{browsed.friend.note}"</p>
+                )}
               </div>
+              <button
+                onClick={() => handleDelete(browsed.friend.id)}
+                className="text-red-400 hover:text-red-600 text-lg flex-shrink-0"
+                title="Törlés"
+              >
+                ×
+              </button>
             </div>
-          )}
+          </div>
         </>
       )}
 
@@ -208,20 +204,12 @@ export default function FriendsBirthdays() {
             onChange={e => setForm({ ...form, name: e.target.value })}
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={form.date}
-              onChange={e => setForm({ ...form, date: e.target.value })}
-              className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-            <input
-              type="time"
-              value={form.time}
-              onChange={e => setForm({ ...form, time: e.target.value })}
-              className="w-28 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-          </div>
+          <input
+            type="date"
+            value={form.date}
+            onChange={e => setForm({ ...form, date: e.target.value })}
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          />
           <textarea
             placeholder="Megjegyzés (opcionális)"
             value={form.note}
